@@ -5,6 +5,7 @@ import subprocess
 import math
 from pyproj import Transformer
 import os
+from osgeo_utils.gdal_merge import main
 
 class BasemapExtractor:
 
@@ -129,8 +130,7 @@ class BasemapExtractor:
 
             optfile.close()
                 
-            process = os.path.dirname(__file__) + os.path.sep + 'gdal_merge.py'
-            subprocess.call([process, '-o', self.outdir + '/' + str(x_coord) + '.tif', '-co', 'TFW=YES', '-co', 'TILED=YES', '-co', 'COMPRESS=LZW', '-co', 'PREDICTOR=2', '--optfile', self.outdir + '/optfile.txt'])
+            main(['gdal_merge.py', '-o', self.outdir + '/' + str(x_coord) + '.tif', '-co', 'TFW=YES', '-co', 'TILED=YES', '-co', 'COMPRESS=LZW', '-co', 'PREDICTOR=2', '--optfile', self.outdir + '/optfile.txt'])
 
         # Then mosaic the row mosaics together in a single file
         with open(self.outdir + '/optfile.txt', 'w') as optfile:
@@ -138,7 +138,7 @@ class BasemapExtractor:
             for x_coord in range(self.get_tiles_id()[0], self.get_tiles_id()[2]+1):
                 optfile.write(self.outdir + '/' + str(x_coord) + '.tif' + ' ')
             
-        subprocess.call([process, '-o', self.outdir + '/Mosaic.tif', '-co', 'TFW=YES', '-co', 'TILED=YES', '-co', 'COMPRESS=LZW', '-co', 'PREDICTOR=2', '--optfile', self.outdir + '/optfile.txt'])
+        main(['gdal_merge.py', '-o', self.outdir + '/Mosaic.tif', '-co', 'TFW=YES', '-co', 'TILED=YES', '-co', 'COMPRESS=LZW', '-co', 'PREDICTOR=2', '--optfile', self.outdir + '/optfile.txt'])
         os.remove(self.outdir + '/optfile.txt')
 
         for x_coord in range(self.get_tiles_id()[0], self.get_tiles_id()[2]+1):
