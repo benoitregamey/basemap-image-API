@@ -7,7 +7,6 @@ debugpy==1.5.1
 decorator==5.1.0
 entrypoints==0.3
 Flask==2.0.2
-gdal==3.3.3
 gunicorn==20.1.0
 idna==3.3
 ipykernel==6.6.0
