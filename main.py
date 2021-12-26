@@ -1,7 +1,5 @@
-from flask.wrappers import Response
 from BasemapExtractor import BasemapExtractor
-from flask import Flask, jsonify, render_template, request, make_response
-from PIL import Image
+from flask import Flask, jsonify, request, make_response
 import os
 
 app = Flask(__name__)
