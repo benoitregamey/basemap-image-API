@@ -154,7 +154,3 @@ class BasemapExtractor:
             for y_coord in range(self.get_tiles_id()[1], self.get_tiles_id()[3]+1):
                 os.remove(self.outdir + "/" + str(x_coord) + "_" + str(y_coord) + ".jpg")
                 os.remove(self.outdir + "/" + str(x_coord) + "_" + str(y_coord) + ".jgw")
-        
-basemap = BasemapExtractor((2846588,5694517,2854758,5684230), 16, "https://api.maptiler.com/maps/topo/256", '@2x.png?key=OeICOfldMgEZFl7CAgF2')
-basemap.download_tiles()
-basemap.mosaic_tiles()
