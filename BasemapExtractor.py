@@ -1,11 +1,9 @@
 import requests
 from PIL import Image
 import os
-import subprocess
 import math
 from pyproj import Transformer
 import os
-from osgeo_utils.gdal_merge import main
 
 class BasemapExtractor:
 
@@ -121,26 +119,42 @@ class BasemapExtractor:
     def mosaic_tiles(self):
         """Mosaic the tiles together. Uses the GDAL library. Must be installed sperately"""
         
-        # First create a mosaic for each row of tiles 
-        for x_coord in range(self.get_tiles_id()[0], self.get_tiles_id()[2]+1):
-            optfile = open(self.outdir + '/optfile.txt', 'w')
+        # First create a mosaic for each column of tiles
+        height = (self.get_tiles_id()[3]+1) - self.get_tiles_id()[1]
+        width = (self.get_tiles_id()[2]+1) - self.get_tiles_id()[0]
+        for x_coord  in range(self.get_tiles_id()[0], self.get_tiles_id()[2]+1):
+            
+            row_mosaic = Image.new("RGB", (512, height * 512))
+            count = 0
             
             for y_coord in range(self.get_tiles_id()[1], self.get_tiles_id()[3]+1):
-                optfile.write(self.outdir + '/' + str(x_coord) + '_' + str(y_coord) + '.jpg' + ' ')
-
-            optfile.close()
-                
-            main(['gdal_merge.py', '-o', self.outdir + '/' + str(x_coord) + '.tif', '-co', 'TFW=YES', '-co', 'TILED=YES', '-co', 'COMPRESS=LZW', '-co', 'PREDICTOR=2', '--optfile', self.outdir + '/optfile.txt'])
-
-        # Then mosaic the row mosaics together in a single file
-        with open(self.outdir + '/optfile.txt', 'w') as optfile:
+                image_to_add = Image.open(self.outdir + "/" + str(x_coord) + "_" + str(y_coord) + ".jpg")
+                row_mosaic.paste(image_to_add, (0, count * 512))
+                count += 1
             
-            for x_coord in range(self.get_tiles_id()[0], self.get_tiles_id()[2]+1):
-                optfile.write(self.outdir + '/' + str(x_coord) + '.tif' + ' ')
-            
-        main(['gdal_merge.py', '-o', self.outdir + '/Mosaic.tif', '-co', 'TFW=YES', '-co', 'TILED=YES', '-co', 'COMPRESS=LZW', '-co', 'PREDICTOR=2', '--optfile', self.outdir + '/optfile.txt'])
-        os.remove(self.outdir + '/optfile.txt')
+            row_mosaic.save(self.outdir + "/" + str(x_coord) + ".jpg", format='JPEG', subsampling=0, quality=100)
+            print(f"Created Mosaic for Column : {x_coord}")
+        
+         
+        # Then mosaic the columns mosaics together in a single file
+        mosaic = Image.new("RGB", (width * 512, height * 512))
+        count = 0
 
         for x_coord in range(self.get_tiles_id()[0], self.get_tiles_id()[2]+1):
-            os.remove(self.outdir + '/' + str(x_coord) + '.tif')
-            os.remove(self.outdir + '/' + str(x_coord) + '.tfw')
+            image_to_add = Image.open(self.outdir + "/" + str(x_coord) + ".jpg")
+            mosaic.paste(image_to_add, (count * 512, 0))
+            count += 1
+        
+        mosaic.save(self.outdir + "/Mosaic.jpg", format='JPEG', subsampling=0, quality=100)
+        print("\nFinal Mosaic Created")
+
+        # Delete all temporary files
+        for x_coord in range(self.get_tiles_id()[0], self.get_tiles_id()[2]+1):
+            os.remove(self.outdir + "/" + str(x_coord) + ".jpg")
+            for y_coord in range(self.get_tiles_id()[1], self.get_tiles_id()[3]+1):
+                os.remove(self.outdir + "/" + str(x_coord) + "_" + str(y_coord) + ".jpg")
+                os.remove(self.outdir + "/" + str(x_coord) + "_" + str(y_coord) + ".jgw")
+        
+basemap = BasemapExtractor((2846588,5694517,2854758,5684230), 16, "https://api.maptiler.com/maps/topo/256", '@2x.png?key=OeICOfldMgEZFl7CAgF2')
+basemap.download_tiles()
+basemap.mosaic_tiles()

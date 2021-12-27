@@ -23,11 +23,11 @@ def get_basemap():
     
     basemap.mosaic_tiles()
 
-    with open(os.path.dirname(__file__) + os.sep + "temp/Mosaic.tif", "rb") as image:
+    with open(os.path.dirname(__file__) + os.sep + "temp/Mosaic.jpg", "rb") as image:
 
         response = make_response(image.read())
-        response.headers.set('Content-Type', 'image/tif')
-        response.headers.set('Content-Disposition', 'attachment', filename='basemap.tif')
+        response.headers.set('Content-Type', 'image/jpg')
+        response.headers.set('Content-Disposition', 'attachment', filename='basemap.jpg')
 
         for file in os.listdir(os.path.dirname(__file__) + os.sep + "temp"):
             os.remove(os.path.join(os.path.dirname(__file__) + os.sep + "temp", file))
