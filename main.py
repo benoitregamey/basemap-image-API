@@ -10,11 +10,10 @@ def get_basemap():
     aoi = request.args.get("aoi")
     source = request.args.get("source")
     key = request.args.get("key")
-    ext = request.args.get("ext")
     zoomlevel = request.args.get("zoomlevel")
     
     perimeter = tuple(map(int, aoi.split(',')))
-    end_url = f'@2x.{ext}?key={key}'
+    end_url = f'@2x.png?key={key}'
 
     basemap = BasemapExtractor(perimeter, int(zoomlevel), source, end_url)
     
