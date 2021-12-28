@@ -15,6 +15,6 @@ zoomlevel must be an integer between 0 and 20
 
 key is your personal API Key provided by Maptiler
 
-The API returns a Mosaic.tif file, the max quality basemap that you required !
+The API returns a basemap.jpg file, the max quality basemap that you required !
 
 If you get the error "Number of tiles to download exeeds 500 !", try to reduce the AOI or the zoomlevel !
